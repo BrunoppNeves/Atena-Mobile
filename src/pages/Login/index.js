@@ -25,13 +25,16 @@ export default function Login({ navigation }) {
     await api
       .post("auth/login", { email: email, password: password })
       .then((response) => {
+        console.log(response.data);
         AsyncStorage.setItem("token", response.data.token);
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
         });
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   useEffect(() => {
@@ -53,7 +56,13 @@ export default function Login({ navigation }) {
             <Image source={logo} style={styles.logo} />
             <Text style={{ fontSize: "30px", color: "white", marginTop: "10%" }}>Login</Text>
             <View style={styles.container}>
-              <TextInput placeholder={"Digite o email"} style={styles.input} onChangeText={(value) => setEmail(value)} />
+              <TextInput
+                placeholder={"Digite o email"}
+                style={styles.input}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={(value) => setEmail(value)}
+              />
               <TextInput
                 placeholder={"Digite a senha"}
                 style={styles.input}
@@ -63,7 +72,7 @@ export default function Login({ navigation }) {
               />
             </View>
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text>Entrar</Text>
+              <Text style={styles.textButton}>Entrar</Text>
             </TouchableOpacity>
           </View>
         </ImageBackground>
@@ -124,5 +133,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: "5%",
     marginTop: "10%",
+  },
+  textButton: {
+    fontSize: "18px",
+    color: "black",
+    fontWeight: "bold",
   },
 });
