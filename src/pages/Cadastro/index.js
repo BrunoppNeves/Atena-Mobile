@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import {
   View,
@@ -93,6 +93,7 @@ export default function Cadastrar() {
                         placeholder="Informe a matrícula do colaborador."
                         placeholderTextColor="#999"
                         autoCapitalize="sentences"
+                        keyboardType="number-pad"
                         paddingLeft={5}
                         autoCorrect={false}
                         value={matricula}
