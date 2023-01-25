@@ -91,8 +91,8 @@ export default function Home({ navigation }) {
             {history.map((item) => {
               return (
                 <View style={styles.info}>
-                  <Text>{item.User.name}</Text>
-                  <Text>{item.date}</Text>
+                  <Text style={styles.textNome}>{item.User.name}</Text>
+                  <Text style={styles.textData}>{item.date}</Text>
                 </View>
               );
             })}
@@ -187,5 +187,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginRight: 10,
+  },
+  textNome: {
+    fontSize: 17,
+  },
+  textData: {
+    fontSize: 17,
+    marginLeft: 10,
   },
 });
