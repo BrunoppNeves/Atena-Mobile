@@ -6,7 +6,7 @@ import Login from "./src/pages/Login";
 import Home from "./src/pages/Home";
 import Colaboradores from "./src/pages/Colaboradores";
 import Cadastrar from "./src/pages/Cadastro";
-
+import Info from "./src/pages/Info";
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
         <Stack.Screen options={{ headerShown: false }} name="Home" component={Home} />
         <Stack.Screen options={{ headerShown: false }} name="Colaboradores" component={Colaboradores} />
         <Stack.Screen options={{ headerShown: false }} name="Cadastrar" component={Cadastrar} />
+        <Stack.Screen options={{ headerShown: false }} name="Info" component={Info} />
       </Stack.Navigator>
     </NavigationContainer>
   );

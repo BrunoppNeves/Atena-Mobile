@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ImageBackground, AsyncStorage, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, AsyncStorage, ScrollView, TouchableOpacity } from "react-native";
 import Menu from "../../components/Menu";
 import background from "../../../assets/Background.png";
 import api from "../../services/api";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Colaboradores() {
+  const navigation = useNavigation();
   const [pessoas, setPessoas] = useState([]);
 
   async function handlePessoasApi() {
@@ -23,6 +25,11 @@ export default function Colaboradores() {
       });
   }
 
+  async function infoPessoa(id) {
+    console.log(id);
+    navigation.navigate("Info", { id });
+  }
+
   useEffect(() => {
     handlePessoasApi();
   }, []);
@@ -33,9 +40,9 @@ export default function Colaboradores() {
         <View style={styles.fundoLista}>
           <Text style={styles.title}>Colaboradores</Text>
           <ScrollView style={styles.scrollList}>
-            {pessoas.map((pessoa) => {
+            {pessoas.map((pessoa, key) => {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => infoPessoa(pessoa.id)}>
                   <View style={styles.info}>
                     <View style={styles.infoPessoa}>
                       <Text style={{ fontSize: 17 }}>Nome: {pessoa.name}</Text>
