@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Menu from "../../components/Menu";
-import { View, Text, StyleSheet, ImageBackground, AsyncStorage, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, AsyncStorage, ScrollView, TouchableOpacity, Image, Alert } from "react-native";
 
 import background from "../../../assets/Background.png";
 import cadeadoAberto from "../../../assets/CadeadoAberto.png";
@@ -21,7 +21,6 @@ export default function Home({ navigation }) {
       })
       .then((response) => {
         setHistory(response.data);
-        console.log(history);
       })
       .catch((error) => {
         console.log(error);
@@ -37,11 +36,10 @@ export default function Home({ navigation }) {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        Alert.alert("Porta aberta!");
       })
       .catch((error) => {
-        console.log("erro");
-        console.log(error);
+        Alert.alert("Erro ao abrir a porta!");
       });
   }
 
@@ -54,11 +52,13 @@ export default function Home({ navigation }) {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        Alert.alert("Porta aberta!");
+        setTimeout(() => {
+          Alert.alert("Porta fechada!");
+        }, 3000);
       })
       .catch((error) => {
-        console.log("ok");
-        console.log(error);
+        Alert.alert("Erro ao abrir a porta!");
       });
   }
 
@@ -71,10 +71,10 @@ export default function Home({ navigation }) {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        Alert.alert("Porta fechada!");
       })
       .catch((error) => {
-        console.log(error);
+        Alert.alert("Erro ao fechar a porta!");
       });
   }
 
@@ -105,7 +105,7 @@ export default function Home({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity style={styles.botao} onPress={abre3s}>
             <Text style={styles.text}>Abrir 3s</Text>
-            <Image source={cadeadoAberto}></Image>
+            <Image source={cadeadoTempo}></Image>
           </TouchableOpacity>
           <TouchableOpacity style={styles.botao} onPress={fecha}>
             <Text style={styles.text}>Fechar</Text>

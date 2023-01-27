@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, StyleSheet, Image, TouchableOpacity, AsyncStorage } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, AsyncStorage, Alert } from "react-native";
 import voltarIcon from "../../../assets/return.png";
 import confirmarIcon from "../../../assets/arrow.png";
 import api from "../../services/api";
@@ -18,6 +18,7 @@ export default function MenuEditar({
   email,
   gitlab,
   telefone,
+  fotos,
 }) {
   const navigation = useNavigation();
 
@@ -28,10 +29,58 @@ export default function MenuEditar({
     });
   }
 
+  async function handleAddImage() {
+    const token = await AsyncStorage.getItem("token");
+    const id = await AsyncStorage.getItem("id");
+    const data = new FormData();
+    fotos.map((image, key) => {
+      data.append(`foto${key + 1}`, {
+        name: image.fileName,
+        uri: image.uri,
+        type: "image/jpg",
+      });
+    });
+    await api
+      .post(`images/upload/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        Alert.alert("Colaborador editado com sucesso!");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Colaboradores" }],
+        });
+      })
+      .catch((error) => {
+        Alert.alert("Erro ao cadastrar colaborador, verifique as informações e tente novamente.");
+      });
+  }
+
+  async function handleDeleteFolder() {
+    const token = await AsyncStorage.getItem("token");
+    const id = await AsyncStorage.getItem("id");
+    await api
+      .get(`images/update/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        handleAddImage();
+      })
+      .catch((error) => {
+        Alert.alert("Erro ao deletar pasta do colaborador");
+      });
+  }
+
   const handleEditar = async (e) => {
     e.preventDefault();
     const token = await AsyncStorage.getItem("token");
     const id = await AsyncStorage.getItem("id");
+
     const user = {};
     if (nome !== "") user.name = nome;
     if (matricula !== "") user.matricula = matricula;
@@ -52,14 +101,12 @@ export default function MenuEditar({
         },
       })
       .then((response) => {
-        console.log(response);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Colaboradores" }],
-        });
+        if (fotos.length > 0) {
+          handleDeleteFolder();
+        }
       })
       .catch((error) => {
-        console.log(error);
+        Alert.alert("Erro ao editar colaborador, tente novamente!");
       });
   };
 

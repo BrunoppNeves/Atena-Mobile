@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, StyleSheet, Image, TouchableOpacity, AsyncStorage } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, AsyncStorage, Alert } from "react-native";
 import voltarIcon from "../../../assets/return.png";
 import editarIcon from "../../../assets/edit.png";
 import deletarIcon from "../../../assets/delete.png";
@@ -27,9 +27,6 @@ export default function MenuCadastrar() {
   async function deletar() {
     const id = await AsyncStorage.getItem("id");
     const token = await AsyncStorage.getItem("token");
-    console.log("abre");
-    console.log(id);
-    console.log("fecha");
     api
       .delete(`/users/delete/${id}`, {
         headers: {
@@ -37,13 +34,14 @@ export default function MenuCadastrar() {
         },
       })
       .then((response) => {
+        Alert.alert("Colaborador deletado com sucesso!");
         navigation.reset({
           index: 0,
           routes: [{ name: "Colaboradores" }],
         });
       })
       .catch((err) => {
-        console.log(err);
+        Alert.alert("Erro ao deletar colaborador, tente novamente!");
       });
   }
 

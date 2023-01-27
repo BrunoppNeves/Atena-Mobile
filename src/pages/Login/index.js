@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   AsyncStorage,
+  Alert,
 } from "react-native";
 
 const background = require("../../../assets/BackgroundLogin.png");
@@ -25,7 +26,6 @@ export default function Login({ navigation }) {
     await api
       .post("auth/login", { email: email, password: password })
       .then((response) => {
-        console.log(response.data);
         AsyncStorage.setItem("token", response.data.token);
         navigation.reset({
           index: 0,
@@ -33,7 +33,7 @@ export default function Login({ navigation }) {
         });
       })
       .catch((error) => {
-        console.log(error);
+        Alert.alert("Erro", "Email ou senha incorretos");
       });
   }
 

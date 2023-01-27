@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   View,
@@ -12,6 +13,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
+  Image,
+  Alert,
 } from "react-native";
 import background from "../../../assets/Background.png";
 import Menu from "../../components/MenuEditar";
@@ -30,6 +33,7 @@ export default function Editar() {
   const [email, setEmail] = useState("");
   const [gitlab, setGitlab] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [images, setImages] = useState([]);
 
   async function getPessoa() {
     const token = await AsyncStorage.getItem("token");
@@ -41,12 +45,26 @@ export default function Editar() {
         },
       })
       .then((response) => {
-        console.log(response.data.user);
         setPessoa(response.data.user);
       })
       .catch((err) => {
         console.error("erro" + err);
       });
+  }
+  async function handleImage() {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (result.canceled === false && result.assets.length >= 5) {
+      setImages(result.assets);
+    } else {
+      Alert.alert("Selecione 5 imagens");
+      setImages([]);
+    }
   }
 
   useEffect(() => {
@@ -268,9 +286,16 @@ export default function Editar() {
                     </View>
                   </View>
                 </View>
-                <TouchableOpacity style={styles.buttonCadastrar}>
-                  <Text style={styles.buttonText}>Adicionar</Text>
-                </TouchableOpacity>
+                <View style={styles.fotos}>
+                  {images.map((image, index) => (
+                    <Image key={index} source={{ uri: image.uri }} style={{ width: 70, height: 70 }} />
+                  ))}
+                </View>
+                <View style={styles.botoes}>
+                  <TouchableOpacity style={styles.buttonCadastrar} onPress={handleImage}>
+                    <Text style={styles.buttonText}>{images.length > 0 ? "Remover imagens" : "Adicionar imagens"}</Text>
+                  </TouchableOpacity>
+                </View>
               </ScrollView>
             </View>
             <Menu
@@ -286,6 +311,7 @@ export default function Editar() {
               email={email}
               gitlab={gitlab}
               telefone={telefone}
+              fotos={images}
             />
           </View>
         </ImageBackground>
@@ -382,5 +408,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
+  },
+  fotos: {
+    width: 350,
+    flexDirection: "row",
+  },
+  botoes: {
+    width: "87%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft: 10,
+    marginTop: 10,
   },
 });

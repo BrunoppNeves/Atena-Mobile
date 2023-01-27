@@ -8,9 +8,12 @@ import Colaboradores from "./src/pages/Colaboradores";
 import Cadastrar from "./src/pages/Cadastro";
 import Info from "./src/pages/Info";
 import Editar from "./src/pages/Editar";
+import { LogBox } from "react-native";
 const Stack = createNativeStackNavigator();
 
 function App() {
+  LogBox.ignoreLogs(["Asyncstorage: ..."]); // Ignore log notification by message
+  LogBox.ignoreAllLogs(); //Ignore all log notifications
   return (
     <NavigationContainer>
       <Stack.Navigator>

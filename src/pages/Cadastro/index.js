@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -12,6 +13,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
+  Alert,
+  Image,
 } from "react-native";
 import background from "../../../assets/Background.png";
 import Menu from "../../components/Menu";
@@ -29,35 +32,96 @@ export default function Cadastrar() {
   const [email, setEmail] = useState("");
   const [gitlab, setGitlab] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [images, setImages] = useState([]);
+  const navigation = useNavigation();
 
-  async function handleAdd() {
+  async function handleImage() {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (result.canceled === false && result.assets.length >= 5) {
+      setImages(result.assets);
+    } else {
+      Alert.alert("Selecione 5 imagens");
+      setImages([]);
+    }
+  }
+
+  async function handleDeleteUser(id) {
     const token = await AsyncStorage.getItem("token");
-    const data = {
-      name: nome,
-      matricula: matricula,
-      escolaridade: escolaridade,
-      aniversario: aniversario,
-      admissao: admissao,
-      competencia: competencia,
-      alocacao: alocacao,
-      time: time,
-      vinculo: vinculo,
-      email: email,
-      gitlab: gitlab,
-      telefone: telefone,
-    };
+    await api.delete(`users/delete/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async function handleAddImage(id) {
+    const token = await AsyncStorage.getItem("token");
+    const data = new FormData();
+    images.map((image, key) => {
+      data.append(`foto${key + 1}`, {
+        name: image.fileName,
+        uri: image.uri,
+        type: "image/jpg",
+      });
+    });
     await api
-      .post("users/create", data, {
+      .post(`images/upload/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       })
       .then((response) => {
-        console.log(response.data);
+        Alert.alert("Colaborador cadastrado com sucesso!");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Colaboradores" }],
+        });
       })
       .catch((error) => {
-        console.log(error);
+        handleDeleteUser(id);
+        Alert.alert("Erro ao cadastrar colaborador, verifique as informações e tente novamente.");
       });
+  }
+
+  async function handleAdd() {
+    if (images.length !== 5) {
+      Alert.alert("Por favor, selecione 5 fotos");
+    } else {
+      const token = await AsyncStorage.getItem("token");
+      const data = {
+        name: nome,
+        matricula: matricula,
+        escolaridade: escolaridade,
+        aniversario: aniversario,
+        admissao: admissao,
+        competencia: competencia,
+        alocacao: alocacao,
+        time: time,
+        vinculo: vinculo,
+        email: email,
+        gitlab: gitlab,
+        telefone: telefone,
+      };
+      await api
+        .post("users/create", data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          handleAddImage(response.data.id);
+        })
+        .catch((error) => {
+          Alert.alert("Erro ao cadastrar colaborador, verifique as informações e tente novamente.");
+        });
+    }
   }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -66,7 +130,7 @@ export default function Cadastrar() {
           <View style={styles.workspace}>
             <View style={styles.fundoLista}>
               <Text style={styles.title}>Cadastro</Text>
-              <ScrollView style={styles.scrollList}>
+              <ScrollView style={styles.scrollList} scrollEnabled={true}>
                 <View style={styles.fundoItem}>
                   <View style={styles.containerInput}>
                     <Text style={styles.label}>Nome</Text>
@@ -275,9 +339,19 @@ export default function Cadastrar() {
                     </View>
                   </View>
                 </View>
-                <TouchableOpacity style={styles.buttonCadastrar} onPress={handleAdd}>
-                  <Text style={styles.buttonText}>Adicionar</Text>
-                </TouchableOpacity>
+                <View style={styles.fotos}>
+                  {images.map((image, index) => (
+                    <Image key={index} source={{ uri: image.uri }} style={{ width: 70, height: 70 }} />
+                  ))}
+                </View>
+                <View style={styles.botoes}>
+                  <TouchableOpacity style={styles.buttonCadastrar} onPress={handleImage}>
+                    <Text style={styles.buttonText}>{images.length > 0 ? "Remover imagens" : "Adicionar imagens"}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonCadastrar} onPress={handleAdd}>
+                    <Text style={styles.buttonText}>Adicionar</Text>
+                  </TouchableOpacity>
+                </View>
               </ScrollView>
             </View>
             <Menu />
@@ -370,11 +444,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     marginBottom: 10,
-    marginLeft: 100,
   },
   buttonText: {
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
+  },
+  fotos: {
+    width: 350,
+    flexDirection: "row",
+  },
+  botoes: {
+    width: "87%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft: 10,
+    marginTop: 10,
   },
 });

@@ -29,7 +29,6 @@ export default function Info() {
         },
       })
       .then((response) => {
-        console.log(response.data.user);
         setPessoa(response.data.user);
       })
       .catch((err) => {

@@ -27,7 +27,8 @@
     "react-native-select-dropdown": "^3.2.1",
     "react-native-web": "~0.18.9",
     "react-navigation": "^4.4.4",
-    "yarn": "^1.22.19"
+    "yarn": "^1.22.19",
+    "expo-image-picker": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -27,7 +27,6 @@ export default function Colaboradores() {
 
   async function infoPessoa(id) {
     AsyncStorage.setItem("id", id);
-    // console.log(id);
     navigation.navigate("Info");
   }
 
